@@ -46,10 +46,7 @@ public class Mount
         AttributeInstance attribute = horseEntity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
 
         if (attribute == null)
-        {
-            player.sendMessage("This doesn't work, FUUUUUCK!");
             return;
-        }
 
         horseEntity.getInventory().setSaddle(new ItemStack(Material.SADDLE, 1));
 
