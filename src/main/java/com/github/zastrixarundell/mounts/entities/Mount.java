@@ -59,12 +59,12 @@ public class Mount
 
         horseEntity.setPassenger(player);
 
-        horseEntity.setMetadata("custommount", new FixedMetadataValue(Mounts.getInstance(), true));
+        horseEntity.setMetadata("custom_mount", new FixedMetadataValue(Mounts.getInstance(), true));
     }
 
     public static boolean isMount(LivingEntity entity)
     {
-        return !entity.getMetadata("custommount").isEmpty();
+        return entity.hasMetadata("custom_mount");
     }
 
 }

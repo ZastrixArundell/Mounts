@@ -21,10 +21,10 @@ public class MountStateListener implements Listener
     @EventHandler
     private void handleDismountEvent(EntityDismountEvent event)
     {
-        if (!(event.getEntity() instanceof Horse))
+        if (!(event.getDismounted() instanceof Horse))
             return;
 
-        Horse horse = (Horse) event.getEntity();
+        Horse horse = (Horse) event.getDismounted();
 
         if(Mount.isMount(horse))
             horse.remove();
