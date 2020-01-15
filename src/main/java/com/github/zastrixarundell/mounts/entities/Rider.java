@@ -18,7 +18,7 @@ public class Rider
 
     private Rider()
     {
-        float speed = Mounts.getInstance().getConfig().getLong("default_speed");
+        float speed = (float) Mounts.getInstance().getConfig().getDouble("default_speed");
         List<String> mounts = Mounts.getInstance().getConfig().getStringList("default_mounts");
 
         this.speed = speed;
@@ -32,6 +32,16 @@ public class Rider
             {
                 e.printStackTrace();
             }
+    }
+
+    public float getSpeed()
+    {
+        return speed;
+    }
+
+    public List<MountType> getKnownMounts()
+    {
+        return knownMounts;
     }
 
     public static Rider asRider(Player player)
@@ -52,6 +62,7 @@ public class Rider
         }
         catch (Exception e)
         {
+            e.printStackTrace();
             return new Rider();
         }
     }
@@ -65,7 +76,7 @@ public class Rider
         Rider rider = new Rider();
         rider.speed = object.get("speed").getAsFloat();
 
-        JsonArray array = object.getAsJsonArray("horses");
+        JsonArray array = object.getAsJsonArray("mounts");
 
         for (JsonElement jsonElement : array)
             try
@@ -91,14 +102,15 @@ public class Rider
         JsonArray mountArray = new JsonArray();
         rider.knownMounts.forEach(mountType -> mountArray.add(mountType.name()));
 
-        jsonObject.add("horses", mountArray);
+        jsonObject.add("mounts", mountArray);
 
         String json = jsonObject.toString();
 
-        FileWriter writer = new FileWriter(file);
+        BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 
         writer.write(json);
 
+        writer.close();
         return rider;
     }
 
