@@ -1,6 +1,7 @@
 package com.github.zastrixarundell.mounts.entities;
 
 import com.github.zastrixarundell.mounts.Mounts;
+import com.github.zastrixarundell.mounts.values.MountType;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -20,11 +21,13 @@ public class Mount
 
     private float speed;
     private UUID owner;
+    private MountType type;
 
-    public Mount(Player owner, float speed)
+    public Mount(Player owner, float speed, MountType type)
     {
         this.owner = owner.getUniqueId();
         this.speed = speed;
+        this.type = type;
     }
 
     public void spawn()
@@ -40,6 +43,8 @@ public class Mount
             return;
 
         Horse horseEntity = (Horse) toSpawnLocation.getWorld().spawnEntity(toSpawnLocation, EntityType.HORSE);
+
+        horseEntity.setColor(type.getColor());
 
         AttributeInstance attribute = horseEntity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
 
@@ -57,9 +62,6 @@ public class Mount
         horseEntity.setMetadata("custom_mount", new FixedMetadataValue(Mounts.getInstance(), true));
     }
 
-    public static boolean isMount(LivingEntity entity)
-    {
-        return entity.hasMetadata("custom_mount");
-    }
+    public static boolean isMount(LivingEntity entity) { return entity.hasMetadata("custom_mount"); }
 
 }
