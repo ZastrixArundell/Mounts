@@ -4,6 +4,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class Mounts extends JavaPlugin
 {
+
+    private static Mounts plugin;
+
     @Override
     public void onEnable()
     {
@@ -15,4 +18,10 @@ public class Mounts extends JavaPlugin
     {
         super.onDisable();
     }
+
+    public static Mounts getInstance()
+    {
+        return plugin;
+    }
+
 }
