@@ -41,19 +41,17 @@ public class Mount
 
         Horse horseEntity = (Horse) toSpawnLocation.getWorld().spawnEntity(toSpawnLocation, EntityType.HORSE);
 
-        horseEntity.setOwner(player);
-
         AttributeInstance attribute = horseEntity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
 
         if (attribute == null)
             return;
 
-        horseEntity.getInventory().setSaddle(new ItemStack(Material.SADDLE, 1));
-
         attribute.setBaseValue(speed);
 
+        horseEntity.getInventory().setSaddle(new ItemStack(Material.SADDLE, 1));
         horseEntity.setTamed(true);
 
+        horseEntity.setOwner(player);
         horseEntity.setPassenger(player);
 
         horseEntity.setMetadata("custom_mount", new FixedMetadataValue(Mounts.getInstance(), true));
