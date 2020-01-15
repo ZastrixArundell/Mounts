@@ -34,9 +34,8 @@ public class MountsCommand implements CommandExecutor
 
         Player sender = (Player) commandSender;
 
-        Mount mount = new Mount(sender, speed);
-
-        mount.spawn();
+        new Mount(sender, speed).spawn();
+        sender.sendMessage(Mounts.prefix + ChatColor.GREEN + "Spawned with speed of: " + speed);
 
         return true;
     }
