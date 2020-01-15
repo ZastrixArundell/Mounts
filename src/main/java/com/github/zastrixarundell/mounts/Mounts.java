@@ -21,6 +21,7 @@ public class Mounts extends JavaPlugin
     @Override
     public void onEnable()
     {
+        saveDefaultConfig();
         plugin = this;
         new MountsCommand(this);
         new MountStateListener(this);
