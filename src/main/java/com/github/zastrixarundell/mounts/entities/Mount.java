@@ -3,11 +3,14 @@ package com.github.zastrixarundell.mounts.entities;
 import com.github.zastrixarundell.mounts.Mounts;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Horse;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.UUID;
@@ -15,7 +18,6 @@ import java.util.UUID;
 public class Mount
 {
 
-    private Horse horseEntity;
     private float speed;
     private UUID owner;
 
@@ -37,7 +39,7 @@ public class Mount
         if (toSpawnLocation.getWorld() == null)
             return;
 
-        horseEntity = (Horse) toSpawnLocation.getWorld().spawnEntity(toSpawnLocation, EntityType.HORSE);
+        Horse horseEntity = (Horse) toSpawnLocation.getWorld().spawnEntity(toSpawnLocation, EntityType.HORSE);
 
         horseEntity.setOwner(player);
 
@@ -49,18 +51,20 @@ public class Mount
             return;
         }
 
+        horseEntity.getInventory().setSaddle(new ItemStack(Material.SADDLE, 1));
+
         attribute.setBaseValue(speed);
 
         horseEntity.setTamed(true);
 
         horseEntity.setPassenger(player);
 
-        horseEntity.setMetadata("custommount", new FixedMetadataValue(Mounts.getInstance(), owner));
+        horseEntity.setMetadata("custommount", new FixedMetadataValue(Mounts.getInstance(), true));
     }
 
-    public void removeEntity()
+    public static boolean isMount(LivingEntity entity)
     {
-        horseEntity.remove();
+        return !entity.getMetadata("custommount").isEmpty();
     }
 
 }
