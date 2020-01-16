@@ -3,6 +3,7 @@ package com.github.zastrixarundell.mounts;
 import com.github.zastrixarundell.mounts.commands.MountsCommand;
 import com.github.zastrixarundell.mounts.entities.Mount;
 import com.github.zastrixarundell.mounts.listeners.MountStateListener;
+import com.github.zastrixarundell.mounts.listeners.PlayerEventListener;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -25,6 +26,7 @@ public class Mounts extends JavaPlugin
         plugin = this;
         new MountsCommand(this);
         new MountStateListener(this);
+        new PlayerEventListener(this);
     }
 
     @Override
