@@ -7,7 +7,9 @@ import org.bukkit.entity.Horse;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.InventoryHolder;
 
 public class PlayerEventListener implements Listener
 {
@@ -39,4 +41,23 @@ public class PlayerEventListener implements Listener
 
     @EventHandler
     private void removePlayerBufferOnQuit(PlayerQuitEvent event) { Rider.deleteRiderBuffer(event.getPlayer()); }
+
+    @EventHandler
+    private void disableGuiClick(InventoryClickEvent event)
+    {
+        InventoryHolder holder = event.getInventory().getHolder();
+
+        if(!(holder instanceof Horse))
+            return;
+
+        Horse horse = (Horse) holder;
+
+        if(Mount.isMount(horse))
+        {
+            event.setCancelled(true);
+
+            if (event.getWhoClicked() instanceof Player)
+                ((Player) event.getWhoClicked()).updateInventory();
+        }
+    }
 }
