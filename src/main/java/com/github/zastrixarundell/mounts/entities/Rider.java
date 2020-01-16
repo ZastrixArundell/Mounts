@@ -2,16 +2,22 @@ package com.github.zastrixarundell.mounts.entities;
 
 import com.github.zastrixarundell.mounts.Mounts;
 import com.github.zastrixarundell.mounts.values.MountType;
-import com.google.gson.*;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.bukkit.entity.Player;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
 public class Rider
 {
+
+    private static HashMap<UUID, Rider> riderMap = new HashMap<>();
 
     private float speed;
     private List<MountType> knownMounts = new ArrayList<>();
@@ -48,6 +54,9 @@ public class Rider
     {
         UUID uuid = player.getUniqueId();
 
+        if(riderMap.containsKey(uuid))
+            return riderMap.get(uuid);
+
         File dataFolder = Mounts.getInstance().getDataFolder();
         File playerFolder = new File(dataFolder.getPath() + File.separator + "players");
 
@@ -58,12 +67,16 @@ public class Rider
 
         try
         {
-            return userFile.exists() ? deserializeJSON(userFile) : createRider(userFile);
+            Rider rider = userFile.exists() ? deserializeJSON(userFile) : createRider(userFile);
+            riderMap.put(uuid, rider);
+            return rider;
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            return new Rider();
+            Rider rider = new Rider();
+            riderMap.put(uuid, rider);
+            return rider;
         }
     }
 
@@ -126,5 +139,7 @@ public class Rider
 
         return rider;
     }
+
+    public static void deleteRiderBuffer(Player player) { riderMap.remove(player.getUniqueId()); }
 
 }
