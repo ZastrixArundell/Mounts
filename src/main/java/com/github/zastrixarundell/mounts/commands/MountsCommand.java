@@ -1,9 +1,7 @@
 package com.github.zastrixarundell.mounts.commands;
 
 import com.github.zastrixarundell.mounts.Mounts;
-import com.github.zastrixarundell.mounts.entities.Mount;
-import com.github.zastrixarundell.mounts.entities.Rider;
-import com.github.zastrixarundell.mounts.values.MountType;
+import com.github.zastrixarundell.mounts.utils.GUIUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -34,25 +32,7 @@ public class MountsCommand implements CommandExecutor
 
         Player sender = (Player) commandSender;
 
-        if (args.length < 1)
-        {
-            sender.sendMessage(Mounts.prefix + ChatColor.RED + "You need to input the mount name!");
-            return true;
-        }
-
-        String name = args[0];
-
-        try
-        {
-            Rider rider = Rider.asRider(sender);
-            new Mount(sender, rider.getSpeed(), MountType.valueOf(name)).spawn();
-            sender.sendMessage(Mounts.prefix + ChatColor.GREEN + "Spawned with speed of: " + rider.getSpeed());
-        }
-        catch (Exception e)
-        {
-            sender.sendMessage(Mounts.prefix + ChatColor.RED + "An error happened, check the name!");
-            return true;
-        }
+        GUIUtils.openGUI(sender, 1);
 
         return true;
     }
