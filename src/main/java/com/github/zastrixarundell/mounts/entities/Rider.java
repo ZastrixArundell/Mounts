@@ -81,7 +81,7 @@ public class Rider
         for (JsonElement jsonElement : array)
             try
             {
-                String name = jsonElement.toString();
+                String name = jsonElement.getAsString();
                 rider.knownMounts.add(MountType.valueOf(name));
             }
             catch (Exception e)
@@ -92,25 +92,38 @@ public class Rider
         return rider;
     }
 
-    private static Rider createRider(File file) throws IOException
+    private static Rider createRider(File file)
     {
         Rider rider = new Rider();
 
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("speed", rider.speed);
+        Runnable runnable = () ->
+        {
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("speed", rider.speed);
 
-        JsonArray mountArray = new JsonArray();
-        rider.knownMounts.forEach(mountType -> mountArray.add(mountType.name()));
+            JsonArray mountArray = new JsonArray();
+            rider.knownMounts.forEach(mountType -> mountArray.add(mountType.name()));
 
-        jsonObject.add("mounts", mountArray);
+            jsonObject.add("mounts", mountArray);
 
-        String json = jsonObject.toString();
+            String json = jsonObject.toString();
 
-        BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+            try
+            {
+                BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 
-        writer.write(json);
+                writer.write(json);
 
-        writer.close();
+                writer.close();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        };
+
+        new Thread(runnable).start();
+
         return rider;
     }
 
