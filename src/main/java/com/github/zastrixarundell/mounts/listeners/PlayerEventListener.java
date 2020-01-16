@@ -2,6 +2,7 @@ package com.github.zastrixarundell.mounts.listeners;
 
 import com.github.zastrixarundell.mounts.Mounts;
 import com.github.zastrixarundell.mounts.entities.Mount;
+import com.github.zastrixarundell.mounts.entities.Rider;
 import org.bukkit.entity.Horse;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -35,4 +36,7 @@ public class PlayerEventListener implements Listener
         if(Mount.isMount(horse))
             horse.remove();
     }
+
+    @EventHandler
+    private void removePlayerBufferOnQuit(PlayerQuitEvent event) { Rider.deleteRiderBuffer(event.getPlayer()); }
 }
