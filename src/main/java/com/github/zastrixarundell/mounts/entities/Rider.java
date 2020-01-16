@@ -40,6 +40,21 @@ public class Rider
             }
     }
 
+    public Rider(float speed, List<String> knownMounts)
+    {
+        this.speed = speed;
+
+        for (String mountName : knownMounts)
+            try
+            {
+                this.knownMounts.add(MountType.valueOf(mountName));
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+    }
+
     public float getSpeed()
     {
         return speed;
@@ -86,23 +101,22 @@ public class Rider
 
         JsonObject object = (JsonObject) parser.parse(new FileReader(file));
 
-        Rider rider = new Rider();
-        rider.speed = object.get("speed").getAsFloat();
+        float speed = object.get("speed").getAsFloat();
+        List<String> knownType = new ArrayList<>();
 
         JsonArray array = object.getAsJsonArray("mounts");
 
         for (JsonElement jsonElement : array)
             try
             {
-                String name = jsonElement.getAsString();
-                rider.knownMounts.add(MountType.valueOf(name));
+                knownType.add(jsonElement.getAsString());
             }
             catch (Exception e)
             {
                 e.printStackTrace();
             }
 
-        return rider;
+        return new Rider(speed, knownType);
     }
 
     private static Rider createRider(File file)
