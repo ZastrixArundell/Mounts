@@ -59,7 +59,7 @@ public class MountsMySQL
                 "   id int NOT NULL AUTO_INCREMENT," +
                 "   uuid varchar(36) NOT NULL," +
                 "   skill_level float NOT NULL DEFAULT 1," +
-                "   last_date varchar(255)," +
+                "   last_date varchar(19)," +
                 "   PRIMARY KEY (id)" +
                 ")";
 
