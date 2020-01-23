@@ -8,13 +8,19 @@ import org.bukkit.inventory.Inventory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class GUIUtils
 {
 
     public static void openGUI(Player player, int page)
     {
-        Rider rider = Rider.asRider(player);
+        Optional<Rider> riderOptional = Rider.asRider(player);
+
+        if(!riderOptional.isPresent())
+            return;
+
+        Rider rider = riderOptional.get();
 
         List<MountType> mounts = rider.getKnownMounts();
         Inventory inventory = Bukkit.createInventory(player, 54, "Your mounts - page " + page);

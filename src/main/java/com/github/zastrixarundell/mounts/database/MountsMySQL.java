@@ -173,7 +173,7 @@ public class MountsMySQL
 
         statement.close();
 
-        query = "SELECT mount FROM mounts_player_mounts WHERE uuid LIKE \"" + uuid.toString() + "\"";
+        query = "SELECT mount FROM mounts_owners WHERE owner = " + id;
 
         statement = connection.createStatement();
         resultSet = statement.executeQuery(query);

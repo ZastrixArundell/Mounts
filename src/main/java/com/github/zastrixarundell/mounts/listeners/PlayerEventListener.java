@@ -15,6 +15,8 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Optional;
+
 public class PlayerEventListener implements Listener
 {
 
@@ -87,12 +89,19 @@ public class PlayerEventListener implements Listener
         if(item.getType() != Material.SADDLE)
             return;
 
-        String rawName = ChatColor.stripColor(item.getItemMeta().getDisplayName().replace(" ", "_").toUpperCase());
+        String name = ChatColor.stripColor(item.getItemMeta().getDisplayName().replace(" ", "_").toUpperCase());
 
         player.closeInventory();
 
-        Rider rider = Rider.asRider(((Player) event.getWhoClicked()));
+        Optional<Rider> riderOptional = Rider.asRider(player);
 
-        new Mount(player, rider.getSpeed(), MountType.valueOf(rawName)).spawn();
+        if(!riderOptional.isPresent())
+            return;
+
+        Rider rider = riderOptional.get();
+
+        float speed = (float) (Mounts.getInstance().getConfig().getDouble("default_speed") + (rider.getSkillLevel() / 10f));
+        new Mount(player, speed, MountType.valueOf(name)).spawn();
+        player.sendMessage(Mounts.prefix + ChatColor.GREEN + "Spawned with speed of: " + speed);
     }
 }
