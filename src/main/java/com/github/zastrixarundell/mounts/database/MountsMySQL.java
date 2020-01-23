@@ -64,9 +64,7 @@ public class MountsMySQL
                 ")";
 
         Statement statement = connection.createStatement();
-
         statement.execute(query);
-
         statement.close();
     }
 
