@@ -100,8 +100,7 @@ public class PlayerEventListener implements Listener
 
         Rider rider = riderOptional.get();
 
-        float speed = (float) (Mounts.getInstance().getConfig().getDouble("default_speed") + (rider.getSkillLevel() / 10f));
+        float speed = 0.22f + (rider.getSkillLevel() / 100f);
         new Mount(player, speed, MountType.valueOf(name)).spawn();
-        player.sendMessage(Mounts.prefix + ChatColor.GREEN + "Spawned with speed of: " + speed);
     }
 }
