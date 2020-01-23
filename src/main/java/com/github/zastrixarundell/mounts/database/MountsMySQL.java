@@ -1,5 +1,7 @@
 package com.github.zastrixarundell.mounts.database;
 
+import com.github.zastrixarundell.mounts.entities.Rider;
+
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -96,6 +98,22 @@ public class MountsMySQL
         Statement statement = connection.createStatement();
         statement.execute(command);
         statement.close();
+    }
+
+    public Rider getPlayerData(UUID uuid) throws SQLException
+    {
+        String query = "SELECT * FROM mounts_players where uuid like \"" + uuid.toString() + "\"";
+
+        Statement statement = connection.createStatement();
+
+        ResultSet resultSet = statement.executeQuery(query);
+
+        float skillLevel = resultSet.getFloat("skill_level");
+        String lastDate = resultSet.getString("last_date");
+
+        statement.close();
+
+
     }
 
     public static void main(String[] args) throws SQLException
