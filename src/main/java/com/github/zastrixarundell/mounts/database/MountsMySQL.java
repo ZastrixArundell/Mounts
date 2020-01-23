@@ -1,7 +1,5 @@
 package com.github.zastrixarundell.mounts.database;
 
-import com.github.zastrixarundell.mounts.entities.Rider;
-
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -46,12 +44,11 @@ public class MountsMySQL
         return this;
     }
 
-    public MountsMySQL openConnection() throws SQLException
+    public void openConnection() throws SQLException
     {
         connection = DriverManager.getConnection("jdbc:mysql://" + hostname + ":" + port +
                 "/" + database, username, password);
 
-        return this;
     }
 
     public void createUserTable() throws SQLException
@@ -63,6 +60,19 @@ public class MountsMySQL
                 "   skill_level float NOT NULL DEFAULT 1," +
                 "   last_date varchar(19)," +
                 "   PRIMARY KEY (id)" +
+                ")";
+
+        Statement statement = connection.createStatement();
+        statement.execute(query);
+        statement.close();
+    }
+
+    public void createOwnersTable() throws SQLException
+    {
+        String query =
+                "CREATE TABLE IF NOT EXISTS mounts_owners(" +
+                "    owner INTEGER NOT NULL,\n" +
+                "    mount VARCHAR(255) NOT NULL\n" +
                 ")";
 
         Statement statement = connection.createStatement();
@@ -100,20 +110,56 @@ public class MountsMySQL
         statement.close();
     }
 
-    public Rider getPlayerData(UUID uuid) throws SQLException
+    public void addOwner(int id, String mountName) throws SQLException
+    {
+        String command =
+                "INSERT INTO mounts_owners(owner, mount) VALUES (?, ?);";
+
+        PreparedStatement preparedStatement = connection.prepareStatement(command);
+        preparedStatement.setInt(1, id);
+        preparedStatement.setString(2, mountName);
+
+        preparedStatement.execute();
+        preparedStatement.close();
+    }
+
+    public int getPlayerData(UUID uuid) throws SQLException
     {
         String query = "SELECT * FROM mounts_players where uuid like \"" + uuid.toString() + "\"";
 
         Statement statement = connection.createStatement();
-
         ResultSet resultSet = statement.executeQuery(query);
 
+        resultSet.next();
+
+        int id = resultSet.getInt("id");
         float skillLevel = resultSet.getFloat("skill_level");
         String lastDate = resultSet.getString("last_date");
 
         statement.close();
 
+        /*
+            query = "SELECT mount FROM mounts_player_mounts WHERE uuid LIKE \"" + uuid.toString() + "\"";
 
+            statement = connection.createStatement();
+            resultSet = statement.executeQuery(query);
+
+            Collection<String> mountCollection = new ArrayList<>();
+
+            while (resultSet.next())
+                mountCollection.add(resultSet.getString("mount"));
+
+            statement.close();
+
+            System.out.println("UUID: " + uuid.toString());
+            System.out.println("ID: " + id);
+            System.out.println("Level: " + skillLevel);
+            System.out.println("Last_Date: " + lastDate);
+            System.out.println("Mounts: ");
+            mountCollection.forEach(mount -> System.out.println("  - " + mount));
+        */
+
+        return id;
     }
 
     public static void main(String[] args) throws SQLException
@@ -125,14 +171,20 @@ public class MountsMySQL
                 .setUsername(System.getenv("SQL_USERNAME"))
                 .setPassword(System.getenv("SQL_PASSWORD"));
 
+        sql.openConnection();
+        sql.createUserTable();
+        sql.createOwnersTable();
+
         UUID uuid = UUID.randomUUID();
 
-        sql.openConnection().createUserTable();
         sql.createPlayerData(uuid);
 
-        System.out.println(uuid.toString());
+        int id = sql.getPlayerData(uuid);
 
-        for (int i = 0; i < 100; i++)
+        for (int i = 0; i < 5; i++)
+            sql.addOwner(id, "mount_" + i);
+
+        for (int i = 0; i < 10; i++)
             sql.updatePlayerLevel(uuid);
     }
 }
