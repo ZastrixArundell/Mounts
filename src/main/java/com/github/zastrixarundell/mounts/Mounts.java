@@ -1,9 +1,11 @@
 package com.github.zastrixarundell.mounts;
 
 import com.github.zastrixarundell.mounts.commands.MountsCommand;
+import com.github.zastrixarundell.mounts.database.MountsMySQL;
 import com.github.zastrixarundell.mounts.entities.Mount;
 import com.github.zastrixarundell.mounts.listeners.MountStateListener;
 import com.github.zastrixarundell.mounts.listeners.PlayerEventListener;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -11,10 +13,13 @@ import org.bukkit.entity.Horse;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.sql.SQLException;
+
 public class Mounts extends JavaPlugin
 {
 
     private static Mounts plugin;
+    private static MountsMySQL mySQL;
 
     public static final String prefix =
             ChatColor.GRAY + "[" + ChatColor.AQUA + "Mounts" + ChatColor.GRAY + "] " + ChatColor.RESET;
@@ -27,6 +32,25 @@ public class Mounts extends JavaPlugin
         new MountsCommand(this);
         new MountStateListener(this);
         new PlayerEventListener(this);
+
+        try
+        {
+            mySQL = new MountsMySQL()
+                    .setHostname(getConfig().getString("hostname"))
+                    .setPort(getConfig().getString("port"))
+                    .setDatabase(getConfig().getString("database"))
+                    .setUsername(getConfig().getString("username"))
+                    .setPassword(getConfig().getString("password"));
+
+            mySQL.openConnection();
+            mySQL.createUserTable();
+            mySQL.createOwnersTable();
+        }
+        catch (SQLException e)
+        {
+            getLogger().severe("Error while connecting to the database! Quitting plugin!");
+            Bukkit.getServer().getPluginManager().disablePlugin(this);
+        }
     }
 
     @Override
@@ -41,6 +65,11 @@ public class Mounts extends JavaPlugin
     public static Mounts getInstance()
     {
         return plugin;
+    }
+
+    public static MountsMySQL getMySQL()
+    {
+        return mySQL;
     }
 
 }

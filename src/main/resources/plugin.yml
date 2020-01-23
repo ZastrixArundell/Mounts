@@ -1,11 +1,10 @@
 main: com.github.zastrixarundell.mounts.Mounts
-name: Mounts
+description: Mounts for players
 version: ${version}
-description: Plugin for mounts
-authors: ["Zastrix"]
-api-version: '1.15'
+name: Mounts
+author: Zastrix
 
 commands:
   mounts:
+    description: Show available mounts
     usage: /<command>
-    description: See all of your mounts.
