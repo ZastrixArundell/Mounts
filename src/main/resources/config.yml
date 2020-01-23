@@ -3,3 +3,8 @@ default_mounts:
   - BRONX_DAPPLE
   - ALDOIR_ASHEN
   - LIRANIAN_BLOND
+hostname: '38.107.214.50'
+port: '3306'
+database: 's66_atmega'
+username: 'u66_c0tnoTiZGu'
+password: '1lL5cYyC8igkqh55EMkokJSc'

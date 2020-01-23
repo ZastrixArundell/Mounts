@@ -1,9 +1,12 @@
 package com.github.zastrixarundell.mounts.database;
 
+import com.github.zastrixarundell.mounts.Mounts;
+import com.github.zastrixarundell.mounts.entities.Rider;
+
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.UUID;
+import java.util.*;
 
 public class MountsMySQL
 {
@@ -93,6 +96,20 @@ public class MountsMySQL
 
         preparedStatement.execute();
         preparedStatement.close();
+
+        List<String> mounts = Mounts.getInstance().getConfig().getStringList("default_mounts");
+
+        int id = getPlayerId(uuid);
+        mounts.forEach(mount -> {
+            try
+            {
+                addOwner(id, mount);
+            }
+            catch (SQLException ignore)
+            {
+
+            }
+        });
     }
 
     public void updatePlayerLevel(UUID uuid) throws SQLException
@@ -123,14 +140,32 @@ public class MountsMySQL
         preparedStatement.close();
     }
 
-    public int getPlayerData(UUID uuid) throws SQLException
+    public int getPlayerId(UUID uuid) throws SQLException
+    {
+        String query = "SELECT id FROM mounts_players where uuid like \"" + uuid.toString() + "\"";
+
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery(query);
+
+        if(!resultSet.next())
+            return -1;
+
+        int id = resultSet.getInt("id");
+
+        statement.close();
+
+        return id;
+    }
+
+    public Optional<Rider> getPlayerData(UUID uuid) throws SQLException
     {
         String query = "SELECT * FROM mounts_players where uuid like \"" + uuid.toString() + "\"";
 
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery(query);
 
-        resultSet.next();
+        if(!resultSet.next())
+            return Optional.empty();
 
         int id = resultSet.getInt("id");
         float skillLevel = resultSet.getFloat("skill_level");
@@ -138,53 +173,20 @@ public class MountsMySQL
 
         statement.close();
 
-        /*
-            query = "SELECT mount FROM mounts_player_mounts WHERE uuid LIKE \"" + uuid.toString() + "\"";
+        query = "SELECT mount FROM mounts_player_mounts WHERE uuid LIKE \"" + uuid.toString() + "\"";
 
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery(query);
+        statement = connection.createStatement();
+        resultSet = statement.executeQuery(query);
 
-            Collection<String> mountCollection = new ArrayList<>();
+        List<String> mountCollection = new ArrayList<>();
 
-            while (resultSet.next())
-                mountCollection.add(resultSet.getString("mount"));
+        while (resultSet.next())
+            mountCollection.add(resultSet.getString("mount"));
 
-            statement.close();
+        statement.close();
 
-            System.out.println("UUID: " + uuid.toString());
-            System.out.println("ID: " + id);
-            System.out.println("Level: " + skillLevel);
-            System.out.println("Last_Date: " + lastDate);
-            System.out.println("Mounts: ");
-            mountCollection.forEach(mount -> System.out.println("  - " + mount));
-        */
+        Rider rider = new Rider(skillLevel, id, lastDate, mountCollection);
 
-        return id;
-    }
-
-    public static void main(String[] args) throws SQLException
-    {
-        MountsMySQL sql = new MountsMySQL()
-                .setHostname(System.getenv("SQL_HOSTNAME"))
-                .setPort(System.getenv("SQL_PORT"))
-                .setDatabase(System.getenv("SQL_DATABASE"))
-                .setUsername(System.getenv("SQL_USERNAME"))
-                .setPassword(System.getenv("SQL_PASSWORD"));
-
-        sql.openConnection();
-        sql.createUserTable();
-        sql.createOwnersTable();
-
-        UUID uuid = UUID.randomUUID();
-
-        sql.createPlayerData(uuid);
-
-        int id = sql.getPlayerData(uuid);
-
-        for (int i = 0; i < 5; i++)
-            sql.addOwner(id, "mount_" + i);
-
-        for (int i = 0; i < 10; i++)
-            sql.updatePlayerLevel(uuid);
+        return Optional.of(rider);
     }
 }

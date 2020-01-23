@@ -44,9 +44,10 @@ public class MountsCommand implements CommandExecutor
 
         try
         {
-            Rider rider = Rider.asRider(sender);
-            new Mount(sender, rider.getSpeed(), MountType.valueOf(name)).spawn();
-            sender.sendMessage(Mounts.prefix + ChatColor.GREEN + "Spawned with speed of: " + rider.getSpeed());
+            Rider rider = Rider.asRider(sender).get();
+            float speed = (float) (Mounts.getInstance().getConfig().getDouble("default_speed") + (rider.getSkillLevel() / 10f));
+            new Mount(sender, speed, MountType.valueOf(name)).spawn();
+            sender.sendMessage(Mounts.prefix + ChatColor.GREEN + "Spawned with speed of: " + speed);
         }
         catch (Exception e)
         {
