@@ -1,0 +1,10 @@
+main: com.github.zastrixarundell.mounts.Mounts
+description: Mounts for players
+version: ${version}
+name: Mounts
+author: Zastrix
+
+commands:
+  mounts:
+    description: Show available mounts
+    usage: /<command>
