@@ -17,6 +17,10 @@ import org.bukkit.metadata.FixedMetadataValue;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Object which represents a mount in the game. It holds the basic info about the mount and
+ * a method for spawning it.
+ */
 public class Mount
 {
 
@@ -54,11 +58,19 @@ public class Mount
         this.name = name;
     }
 
+    /**
+     * Gets the race of the mount.
+     * @return The race of the mount.
+     */
     public MountRace getRace()
     {
         return race;
     }
 
+    /**
+     * Spawns the mount and automatically saddles the player which is the owner.
+     * It adds a custom metadata which tells whether the mount is custom or not.
+     */
     public void spawn()
     {
         Player player = Bukkit.getPlayer(owner);
