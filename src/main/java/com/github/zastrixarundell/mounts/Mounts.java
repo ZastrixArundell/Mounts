@@ -1,7 +1,9 @@
 package com.github.zastrixarundell.mounts;
 
 import com.github.zastrixarundell.mounts.commands.MountsCommand;
-import com.github.zastrixarundell.mounts.database.MountsMySQL;
+import com.github.zastrixarundell.mounts.database.MountsDatabase;
+import com.github.zastrixarundell.mounts.database.MySQLDatabase;
+import com.github.zastrixarundell.mounts.database.SQLiteDatabase;
 import com.github.zastrixarundell.mounts.entities.Mount;
 import com.github.zastrixarundell.mounts.listeners.MountStateListener;
 import com.github.zastrixarundell.mounts.listeners.PlayerEventListener;
@@ -13,13 +15,14 @@ import org.bukkit.entity.Horse;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.sql.SQLException;
 
 public class Mounts extends JavaPlugin
 {
 
     private static Mounts plugin;
-    private static MountsMySQL mySQL;
+    private static MountsDatabase database;
 
     public static final String prefix =
             ChatColor.GRAY + "[" + ChatColor.AQUA + "Mounts" + ChatColor.GRAY + "] " + ChatColor.RESET;
@@ -35,20 +38,29 @@ public class Mounts extends JavaPlugin
 
         try
         {
-            mySQL = new MountsMySQL()
-                    .setHostname(getConfig().getString("hostname"))
-                    .setPort(getConfig().getString("port"))
-                    .setDatabase(getConfig().getString("database"))
-                    .setUsername(getConfig().getString("username"))
-                    .setPassword(getConfig().getString("password"));
+            String hostname = getConfig().getString("hostname");
+            String port = getConfig().getString("port");
+            String databaseUrl = getConfig().getString("database");
+            boolean useSQLite = getConfig().getBoolean("use_sqlite");
 
-            mySQL.openConnection();
-            mySQL.createUserTable();
-            mySQL.createOwnersTable();
+            if(!useSQLite && Helpers.isNonEmpty(hostname) && Helpers.isNonEmpty(port)
+               && Helpers.isNonEmpty(databaseUrl))
+            {
+                String username = getConfig().getString("username");
+                String password = getConfig().getString("password");
+
+                database = new MySQLDatabase(username, password, hostname, port, databaseUrl);
+            }
+            else
+                database = new SQLiteDatabase(getDataFolder().getAbsolutePath() + File.separator + "database.db");
+
+            database.createUserTable();
+            database.createMountsTable();
         }
         catch (SQLException e)
         {
             getLogger().severe("Error while connecting to the database! Quitting plugin!");
+            e.printStackTrace();
             Bukkit.getServer().getPluginManager().disablePlugin(this);
         }
     }
@@ -60,6 +72,15 @@ public class Mounts extends JavaPlugin
             for (Entity horse : world.getEntitiesByClasses(Horse.class))
                 if(Mount.isMount((LivingEntity) horse))
                     horse.remove();
+
+        try
+        {
+            database.closeConnection();
+        }
+        catch (Exception ignore)
+        {
+
+        }
     }
 
     public static Mounts getInstance()
@@ -67,9 +88,9 @@ public class Mounts extends JavaPlugin
         return plugin;
     }
 
-    public static MountsMySQL getMySQL()
+    public static MountsDatabase getDatabase()
     {
-        return mySQL;
+        return database;
     }
 
 }

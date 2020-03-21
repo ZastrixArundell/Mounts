@@ -1,7 +1,8 @@
-default_mounts:
-  - BRONX_DAPPLE
-hostname: '38.107.214.50'
-port: '3306'
-database: 's66_atmega'
-username: 'u66_c0tnoTiZGu'
-password: '1lL5cYyC8igkqh55EMkokJSc'
+use_sqlite: true
+
+# You only need to use this if you are using MySQL
+hostname: ''
+port: ''
+database: ''
+username: ''
+password: ''

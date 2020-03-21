@@ -3,7 +3,7 @@ package com.github.zastrixarundell.mounts.listeners;
 import com.github.zastrixarundell.mounts.Mounts;
 import com.github.zastrixarundell.mounts.entities.Mount;
 import com.github.zastrixarundell.mounts.entities.Rider;
-import com.github.zastrixarundell.mounts.values.MountType;
+import com.github.zastrixarundell.mounts.values.MountRace;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Horse;
@@ -93,14 +93,12 @@ public class PlayerEventListener implements Listener
 
         player.closeInventory();
 
+
         Optional<Rider> riderOptional = Rider.asRider(player);
 
         if(!riderOptional.isPresent())
             return;
 
-        Rider rider = riderOptional.get();
-
-        float speed = 0.22f + (rider.getSkillLevel() / 100f);
-        new Mount(player, speed, MountType.valueOf(name)).spawn();
+        new Mount(player.getUniqueId(), MountRace.HORSE, 0, "kek").spawn();
     }
 }
