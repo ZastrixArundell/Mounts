@@ -2,67 +2,30 @@ package com.github.zastrixarundell.mounts.database;
 
 import com.github.zastrixarundell.mounts.Mounts;
 import com.github.zastrixarundell.mounts.entities.Rider;
+import org.bukkit.entity.Player;
 
 import java.sql.*;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.*;
+import java.util.Date;
 
-public class MountsMySQL
+public abstract class MountsDatabase
 {
-
-    private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-    private String hostname, username, password, database, port;
 
     private Connection connection;
 
-    public MountsMySQL setHostname(String hostname)
+    MountsDatabase(String path) throws SQLException
     {
-        this.hostname = hostname;
-        return this;
-    }
-
-    public MountsMySQL setUsername(String username)
-    {
-        this.username = username;
-        return this;
-    }
-
-    public MountsMySQL setPassword(String password)
-    {
-        this.password = password;
-        return this;
-    }
-
-    public MountsMySQL setDatabase(String database)
-    {
-        this.database = database;
-        return this;
-    }
-
-    public MountsMySQL setPort(String port)
-    {
-        this.port = port;
-        return this;
-    }
-
-    public void openConnection() throws SQLException
-    {
-        connection = DriverManager.getConnection("jdbc:mysql://" + hostname + ":" + port +
-                "/" + database, username, password);
-
+        connection = DriverManager.getConnection(path);
     }
 
     public void createUserTable() throws SQLException
     {
         String query =
                 "CREATE TABLE IF NOT EXISTS mounts_players(" +
-                "   id int NOT NULL AUTO_INCREMENT," +
-                "   uuid varchar(36) NOT NULL," +
-                "   skill_level float NOT NULL DEFAULT 1," +
-                "   last_date varchar(19)," +
-                "   PRIMARY KEY (id)" +
+                        "uuid varchar(255) NOT NULL PRIMARY KEY," +
+                        "skill_level float NOT NULL DEFAULT 1," +
+                        "last_date varchar(255)" +
                 ")";
 
         Statement statement = connection.createStatement();
@@ -70,17 +33,32 @@ public class MountsMySQL
         statement.close();
     }
 
-    public void createOwnersTable() throws SQLException
+    // jmKMwELHdT
+
+    public void createMountsTable() throws SQLException
     {
         String query =
-                "CREATE TABLE IF NOT EXISTS mounts_owners(" +
-                "    owner INTEGER NOT NULL,\n" +
-                "    mount VARCHAR(255) NOT NULL\n" +
+                "CREATE TABLE IF NOT EXISTS mounts(" +
+                        "owner_uuid VARCHAR(255) NOT NULL," +
+                        "race INTEGER NOT NULL," +
+                        "type INTEGER," +
+                        "name VARCHAR(255)" +
+                        "CONSTRAINT mount_owners" +
+                        "FOREIGN KEY (owner_uuid) REFERENCES mounts_players (uuid)" +
                 ")";
 
         Statement statement = connection.createStatement();
         statement.execute(query);
         statement.close();
+    }
+
+    // WORK LOGIC
+
+    private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+    public void createPlayerData(Player player) throws SQLException
+    {
+        createPlayerData(player.getUniqueId());
     }
 
     public void createPlayerData(UUID uuid) throws SQLException
@@ -112,15 +90,20 @@ public class MountsMySQL
         });
     }
 
+    public void updatePlayerLevel(Player player) throws SQLException
+    {
+        updatePlayerLevel(player.getUniqueId());
+    }
+
     public void updatePlayerLevel(UUID uuid) throws SQLException
     {
         String dateNow = simpleDateFormat.format(new Date());
 
         String command =
                 "UPDATE mounts_players " +
-                "SET skill_level = if(skill_level < 10, skill_level + 0.1, skill_level)," +
-                "last_date=\"" + dateNow + "\" " +
-                "WHERE uuid=\"" + uuid.toString() + "\";";
+                        "SET skill_level = if(skill_level < 10, skill_level + 0.1, skill_level)," +
+                        "last_date=\"" + dateNow + "\" " +
+                        "WHERE uuid=\"" + uuid.toString() + "\";";
 
         Statement statement = connection.createStatement();
         statement.execute(command);
@@ -167,7 +150,6 @@ public class MountsMySQL
         if(!resultSet.next())
             return Optional.empty();
 
-        int id = resultSet.getInt("id");
         float skillLevel = resultSet.getFloat("skill_level");
         String lastDate = resultSet.getString("last_date");
 
@@ -189,4 +171,5 @@ public class MountsMySQL
 
         return Optional.of(rider);
     }
+
 }

@@ -1,7 +1,9 @@
 package com.github.zastrixarundell.mounts;
 
 import com.github.zastrixarundell.mounts.commands.MountsCommand;
-import com.github.zastrixarundell.mounts.database.MountsMySQL;
+import com.github.zastrixarundell.mounts.database.MountsDatabase;
+import com.github.zastrixarundell.mounts.database.MySQLDatabase;
+import com.github.zastrixarundell.mounts.database.SQLiteDatabase;
 import com.github.zastrixarundell.mounts.entities.Mount;
 import com.github.zastrixarundell.mounts.listeners.MountStateListener;
 import com.github.zastrixarundell.mounts.listeners.PlayerEventListener;
@@ -19,7 +21,7 @@ public class Mounts extends JavaPlugin
 {
 
     private static Mounts plugin;
-    private static MountsMySQL mySQL;
+    private static MountsDatabase database;
 
     public static final String prefix =
             ChatColor.GRAY + "[" + ChatColor.AQUA + "Mounts" + ChatColor.GRAY + "] " + ChatColor.RESET;
@@ -35,16 +37,23 @@ public class Mounts extends JavaPlugin
 
         try
         {
-            mySQL = new MountsMySQL()
-                    .setHostname(getConfig().getString("hostname"))
-                    .setPort(getConfig().getString("port"))
-                    .setDatabase(getConfig().getString("database"))
-                    .setUsername(getConfig().getString("username"))
-                    .setPassword(getConfig().getString("password"));
+            String hostname = getConfig().getString("hostname");
+            String port = getConfig().getString("port");
+            String databaseUrl = getConfig().getString("database");
 
-            mySQL.openConnection();
-            mySQL.createUserTable();
-            mySQL.createOwnersTable();
+            if(Helpers.isNonEmpty(hostname) && Helpers.isNonEmpty(port)
+               && Helpers.isNonEmpty(databaseUrl))
+            {
+                String username = getConfig().getString("username");
+                String password = getConfig().getString("password");
+
+                database = new MySQLDatabase(username, password, hostname, port, databaseUrl);
+            }
+            else
+                database = new SQLiteDatabase();
+
+            database.createUserTable();
+            database.createMountsTable();
         }
         catch (SQLException e)
         {
@@ -67,9 +76,9 @@ public class Mounts extends JavaPlugin
         return plugin;
     }
 
-    public static MountsMySQL getMySQL()
+    public static MountsDatabase getMySQL()
     {
-        return mySQL;
+        return database;
     }
 
 }
