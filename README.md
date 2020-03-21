@@ -26,4 +26,4 @@ You should take a lot at this image: ![Horses and types](https://raw.githubuserc
 
 In the plugin you can set the type of the horse as an integer. You just count from the top left towards the right and down on 
 every row and see the index of the horse. If you look at the image that the horse which is `White` and 
-`None` markings is located at position 1, The same way the horse which is `Browb` with `White spots` is 25.  
+`None` markings is located at position 1, The same way the horse which is `Brown` with `White spots` is 25.  
