@@ -14,6 +14,11 @@ import java.util.Optional;
 public class GUIUtils
 {
 
+    /**
+     * Open the GUI for the player.
+     * @param player The player to whom the GUI will be opened.
+     * @param page The index of the page.
+     */
     public static void openGUI(Player player, int page)
     {
 
@@ -33,6 +38,12 @@ public class GUIUtils
 
     }
 
+    /**
+     * Gets the mounts which should be displayed on that specific page index.
+     * @param mounts The list of mounts which the user has.
+     * @param page The index of the page.
+     * @return A list which holds all of the mounts which should be displayed on a specific page index.
+     */
     public static List<Mount> getMountsForPageIndex(List<Mount> mounts, int page)
     {
         page--;

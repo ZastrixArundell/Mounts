@@ -35,34 +35,7 @@ public class Mounts extends JavaPlugin
         new MountsCommand(this);
         new MountStateListener(this);
         new PlayerEventListener(this);
-
-        try
-        {
-            String hostname = getConfig().getString("hostname");
-            String port = getConfig().getString("port");
-            String databaseUrl = getConfig().getString("database");
-            boolean useSQLite = getConfig().getBoolean("use_sqlite");
-
-            if(!useSQLite && Helpers.isNonEmpty(hostname) && Helpers.isNonEmpty(port)
-               && Helpers.isNonEmpty(databaseUrl))
-            {
-                String username = getConfig().getString("username");
-                String password = getConfig().getString("password");
-
-                database = new MySQLDatabase(username, password, hostname, port, databaseUrl);
-            }
-            else
-                database = new SQLiteDatabase(getDataFolder().getAbsolutePath() + File.separator + "database.db");
-
-            database.createUserTable();
-            database.createMountsTable();
-        }
-        catch (SQLException e)
-        {
-            getLogger().severe("Error while connecting to the database! Quitting plugin!");
-            e.printStackTrace();
-            Bukkit.getServer().getPluginManager().disablePlugin(this);
-        }
+        setupDatabase();
     }
 
     @Override
@@ -80,6 +53,37 @@ public class Mounts extends JavaPlugin
         catch (Exception ignore)
         {
 
+        }
+    }
+
+    private void setupDatabase()
+    {
+        try
+        {
+            String hostname = getConfig().getString("hostname");
+            String port = getConfig().getString("port");
+            String databaseUrl = getConfig().getString("database");
+            boolean useSQLite = getConfig().getBoolean("use_sqlite");
+
+            if(!useSQLite && Helpers.isNonEmpty(hostname) && Helpers.isNonEmpty(port)
+                    && Helpers.isNonEmpty(databaseUrl))
+            {
+                String username = getConfig().getString("username");
+                String password = getConfig().getString("password");
+
+                database = new MySQLDatabase(username, password, hostname, port, databaseUrl);
+            }
+            else
+                database = new SQLiteDatabase(getDataFolder().getAbsolutePath() + File.separator + "database.db");
+
+            database.createUserTable();
+            database.createMountsTable();
+        }
+        catch (SQLException e)
+        {
+            getLogger().severe("Error while connecting to the database! Quitting plugin!");
+            e.printStackTrace();
+            Bukkit.getServer().getPluginManager().disablePlugin(this);
         }
     }
 
