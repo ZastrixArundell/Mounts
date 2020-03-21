@@ -1,8 +1,6 @@
 package com.github.zastrixarundell.mounts.database;
 
-import com.github.zastrixarundell.mounts.Mounts;
 import com.github.zastrixarundell.mounts.entities.Rider;
-import org.bukkit.entity.Player;
 
 import java.sql.*;
 import java.text.SimpleDateFormat;
@@ -40,7 +38,7 @@ public abstract class MountsDatabase
         String query =
                 "CREATE TABLE IF NOT EXISTS mounts(" +
                         "owner_uuid VARCHAR(255) NOT NULL," +
-                        "race INTEGER NOT NULL," +
+                        "race VARCHAR(255) NOT NULL," +
                         "type INTEGER," +
                         "name VARCHAR(255)" +
                         "CONSTRAINT mount_owners" +
@@ -56,11 +54,6 @@ public abstract class MountsDatabase
 
     private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-    public void createPlayerData(Player player) throws SQLException
-    {
-        createPlayerData(player.getUniqueId());
-    }
-
     public void createPlayerData(UUID uuid) throws SQLException
     {
         String dateNow = simpleDateFormat.format(new Date());
@@ -74,25 +67,6 @@ public abstract class MountsDatabase
 
         preparedStatement.execute();
         preparedStatement.close();
-
-        List<String> mounts = Mounts.getInstance().getConfig().getStringList("default_mounts");
-
-        int id = getPlayerId(uuid);
-        mounts.forEach(mount -> {
-            try
-            {
-                addOwner(id, mount);
-            }
-            catch (SQLException ignore)
-            {
-
-            }
-        });
-    }
-
-    public void updatePlayerLevel(Player player) throws SQLException
-    {
-        updatePlayerLevel(player.getUniqueId());
     }
 
     public void updatePlayerLevel(UUID uuid) throws SQLException
@@ -110,17 +84,29 @@ public abstract class MountsDatabase
         statement.close();
     }
 
-    public void addOwner(int id, String mountName) throws SQLException
+    public Rider getPlayerData(UUID uuid) throws SQLException
     {
-        String command =
-                "INSERT INTO mounts_owners(owner, mount) VALUES (?, ?);";
+        ResultSet resultSet = getPlayerSQL(uuid);
 
-        PreparedStatement preparedStatement = connection.prepareStatement(command);
-        preparedStatement.setInt(1, id);
-        preparedStatement.setString(2, mountName);
+        float skillLevel = resultSet.getFloat("skill_level");
+        String lastDate = resultSet.getString("last_date");
+    }
 
-        preparedStatement.execute();
-        preparedStatement.close();
+    private ResultSet getPlayerSQL(UUID uuid) throws SQLException
+    {
+        String query =
+                "SELECT skill_level, last_date FROM mounts_players WHERE uuid LIKE \"" + uuid.toString() + "\"";
+
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery(query);
+
+        if(!resultSet.next())
+        {
+            createPlayerData(uuid);
+            resultSet = getPlayerSQL(uuid);
+        }
+
+        return resultSet;
     }
 
     public int getPlayerId(UUID uuid) throws SQLException
@@ -138,38 +124,6 @@ public abstract class MountsDatabase
         statement.close();
 
         return id;
-    }
-
-    public Optional<Rider> getPlayerData(UUID uuid) throws SQLException
-    {
-        String query = "SELECT * FROM mounts_players where uuid like \"" + uuid.toString() + "\"";
-
-        Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery(query);
-
-        if(!resultSet.next())
-            return Optional.empty();
-
-        float skillLevel = resultSet.getFloat("skill_level");
-        String lastDate = resultSet.getString("last_date");
-
-        statement.close();
-
-        query = "SELECT mount FROM mounts_owners WHERE owner = " + id;
-
-        statement = connection.createStatement();
-        resultSet = statement.executeQuery(query);
-
-        List<String> mountCollection = new ArrayList<>();
-
-        while (resultSet.next())
-            mountCollection.add(resultSet.getString("mount"));
-
-        statement.close();
-
-        Rider rider = new Rider(skillLevel, id, lastDate, mountCollection);
-
-        return Optional.of(rider);
     }
 
 }
