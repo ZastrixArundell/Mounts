@@ -15,6 +15,7 @@ import org.bukkit.entity.Horse;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.sql.SQLException;
 
 public class Mounts extends JavaPlugin
@@ -50,7 +51,7 @@ public class Mounts extends JavaPlugin
                 database = new MySQLDatabase(username, password, hostname, port, databaseUrl);
             }
             else
-                database = new SQLiteDatabase();
+                database = new SQLiteDatabase(getDataFolder() + File.separator + "database.db");
 
             database.createUserTable();
             database.createMountsTable();
@@ -76,7 +77,7 @@ public class Mounts extends JavaPlugin
         return plugin;
     }
 
-    public static MountsDatabase getMySQL()
+    public static MountsDatabase getDatabase()
     {
         return database;
     }

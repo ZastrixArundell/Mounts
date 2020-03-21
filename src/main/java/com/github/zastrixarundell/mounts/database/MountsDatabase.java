@@ -17,6 +17,8 @@ public abstract class MountsDatabase
         connection = DriverManager.getConnection(path);
     }
 
+    // jmKMwELHdT
+
     public void createUserTable() throws SQLException
     {
         String query =
@@ -31,8 +33,6 @@ public abstract class MountsDatabase
         statement.close();
     }
 
-    // jmKMwELHdT
-
     public void createMountsTable() throws SQLException
     {
         String query =
@@ -40,8 +40,8 @@ public abstract class MountsDatabase
                         "owner_uuid VARCHAR(255) NOT NULL," +
                         "race VARCHAR(255) NOT NULL," +
                         "type INTEGER," +
-                        "name VARCHAR(255)" +
-                        "CONSTRAINT mount_owners" +
+                        "name VARCHAR(255)," +
+                        "CONSTRAINT mount_owners " +
                         "FOREIGN KEY (owner_uuid) REFERENCES mounts_players (uuid)" +
                 ")";
 
@@ -53,6 +53,11 @@ public abstract class MountsDatabase
     // WORK LOGIC
 
     private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+    static
+    {
+        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+    }
 
     public void createPlayerData(UUID uuid) throws SQLException
     {
@@ -75,7 +80,7 @@ public abstract class MountsDatabase
 
         String command =
                 "UPDATE mounts_players " +
-                        "SET skill_level = if(skill_level < 10, skill_level + 0.1, skill_level)," +
+                        "SET skill_level = (CASE WHEN skill_level + 0.1 < 10 THEN skill_level + 0.1 ELSE skill_level END)," +
                         "last_date=\"" + dateNow + "\" " +
                         "WHERE uuid=\"" + uuid.toString() + "\";";
 
@@ -90,6 +95,8 @@ public abstract class MountsDatabase
 
         float skillLevel = resultSet.getFloat("skill_level");
         String lastDate = resultSet.getString("last_date");
+
+        return new Rider(skillLevel, lastDate, new ArrayList<>());
     }
 
     private ResultSet getPlayerSQL(UUID uuid) throws SQLException
@@ -109,21 +116,32 @@ public abstract class MountsDatabase
         return resultSet;
     }
 
-    public int getPlayerId(UUID uuid) throws SQLException
+    private ResultSet getMounts()
     {
-        String query = "SELECT id FROM mounts_players where uuid like \"" + uuid.toString() + "\"";
 
-        Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery(query);
+    }
 
-        if(!resultSet.next())
-            return -1;
+    /*
+        Function only used on mock database in order to debug.
+     */
+    public static void main(String[] args) throws SQLException
+    {
+        String databaseUri = System.getenv("DATABASE_URI");
+        MountsDatabase database = new SQLiteDatabase(databaseUri);
+        database.createUserTable();
+        database.createMountsTable();
+        UUID uuid = UUID.fromString("25f7b39e-4458-4b72-9ccb-93efb8213d6a");
 
-        int id = resultSet.getInt("id");
-
-        statement.close();
-
-        return id;
+        /* Update the level here */
+        for (int i = 0; i < 1010; i++)
+        {
+            Rider rider = database.getPlayerData(uuid);
+            System.out.println(rider.getSkillLevel());
+            database.updatePlayerLevel(uuid);
+            rider = database.getPlayerData(uuid);
+            System.out.println(rider.getSkillLevel());
+            System.out.println(uuid.toString());
+        }
     }
 
 }

@@ -15,6 +15,7 @@ public class GUIUtils
 
     public static void openGUI(Player player, int page)
     {
+        /*
         Optional<Rider> riderOptional = Rider.asRider(player);
 
         if(!riderOptional.isPresent())
@@ -28,6 +29,7 @@ public class GUIUtils
         getMountsForPageIndex(mounts, page).forEach(mountType -> inventory.addItem(mountType.asItem()));
 
         player.openInventory(inventory);
+        */
     }
 
     public static List<MountType> getMountsForPageIndex(List<MountType> mounts, int page)

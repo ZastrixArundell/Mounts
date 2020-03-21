@@ -93,6 +93,7 @@ public class PlayerEventListener implements Listener
 
         player.closeInventory();
 
+        /*
         Optional<Rider> riderOptional = Rider.asRider(player);
 
         if(!riderOptional.isPresent())
@@ -102,5 +103,7 @@ public class PlayerEventListener implements Listener
 
         float speed = 0.22f + (rider.getSkillLevel() / 100f);
         new Mount(player, speed, MountType.valueOf(name)).spawn();
+
+         */
     }
 }
