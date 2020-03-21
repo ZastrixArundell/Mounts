@@ -1,10 +1,8 @@
 package com.github.zastrixarundell.mounts.entities;
 
-import com.github.zastrixarundell.mounts.Mounts;
 import com.github.zastrixarundell.mounts.values.MountType;
 import org.bukkit.entity.Player;
 
-import java.sql.SQLException;
 import java.util.*;
 
 public class Rider
@@ -13,15 +11,13 @@ public class Rider
     private static HashMap<UUID, Rider> riderMap = new HashMap<>();
 
     private float skillLevel;
-    private int id;
     private String lastDate;
 
     private List<MountType> knownMounts = new ArrayList<>();
 
-    public Rider(float skillLevel, int id, String lastDate, List<String> mounts)
+    public Rider(float skillLevel, String lastDate, List<String> mounts)
     {
         this.skillLevel = skillLevel;
-        this.id = id;
         this.lastDate = lastDate;
 
         for (String mountName : mounts)
@@ -37,13 +33,12 @@ public class Rider
 
     public float getSkillLevel() { return skillLevel; }
 
-    public int getId() { return id; }
-
     public List<MountType> getKnownMounts()
     {
         return knownMounts;
     }
 
+    /*
     public static Optional<Rider> asRider(Player player)
     {
         UUID uuid = player.getUniqueId();
@@ -67,7 +62,7 @@ public class Rider
         {
             return Optional.empty();
         }
-    }
+    }*/
 
 
     public static void deleteRiderBuffer(Player player) { riderMap.remove(player.getUniqueId()); }
