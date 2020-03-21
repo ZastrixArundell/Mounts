@@ -1,8 +1,11 @@
 package com.github.zastrixarundell.mounts.entities;
 
-import com.github.zastrixarundell.mounts.values.MountType;
+import com.github.zastrixarundell.mounts.Mounts;
+import com.github.zastrixarundell.mounts.database.MountsDatabase;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.sql.SQLException;
 import java.util.*;
 
 public class Rider
@@ -12,33 +15,27 @@ public class Rider
 
     private float skillLevel;
     private String lastDate;
+    private List<Mount> mounts;
 
-    private List<MountType> knownMounts = new ArrayList<>();
-
-    public Rider(float skillLevel, String lastDate, List<String> mounts)
+    public Rider(float skillLevel, String lastDate, List<Mount> mounts)
     {
         this.skillLevel = skillLevel;
         this.lastDate = lastDate;
-
-        for (String mountName : mounts)
-            try
-            {
-                knownMounts.add(MountType.valueOf(mountName));
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
+        this.mounts = mounts;
     }
 
     public float getSkillLevel() { return skillLevel; }
 
-    public List<MountType> getKnownMounts()
+    public List<Mount> getMounts()
     {
-        return knownMounts;
+        return mounts;
     }
 
-    /*
+    public String getLastDate()
+    {
+        return lastDate;
+    }
+
     public static Optional<Rider> asRider(Player player)
     {
         UUID uuid = player.getUniqueId();
@@ -48,21 +45,17 @@ public class Rider
 
         try
         {
-            Optional<Rider> riderOptional = Mounts.getMySQL().getPlayerData(uuid);
-
-            if (!riderOptional.isPresent())
-            {
-                Mounts.getMySQL().createPlayerData(uuid);
-                riderOptional = Mounts.getMySQL().getPlayerData(uuid);
-            }
-
-            return riderOptional;
+            MountsDatabase database = Mounts.getDatabase();
+            Rider rider = database.getPlayerData(uuid);
+            Mounts.getInstance().getLogger().info(String.valueOf(rider.getMounts().size()));
+            return Optional.of(rider);
         }
         catch (SQLException e)
         {
+            Mounts.getInstance().getLogger().severe("Error while reading the player from the database!");
             return Optional.empty();
         }
-    }*/
+    }
 
 
     public static void deleteRiderBuffer(Player player) { riderMap.remove(player.getUniqueId()); }

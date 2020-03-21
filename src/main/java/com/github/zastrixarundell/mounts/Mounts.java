@@ -41,8 +41,9 @@ public class Mounts extends JavaPlugin
             String hostname = getConfig().getString("hostname");
             String port = getConfig().getString("port");
             String databaseUrl = getConfig().getString("database");
+            boolean useSQLite = getConfig().getBoolean("use_sqlite");
 
-            if(Helpers.isNonEmpty(hostname) && Helpers.isNonEmpty(port)
+            if(!useSQLite && Helpers.isNonEmpty(hostname) && Helpers.isNonEmpty(port)
                && Helpers.isNonEmpty(databaseUrl))
             {
                 String username = getConfig().getString("username");
@@ -51,7 +52,7 @@ public class Mounts extends JavaPlugin
                 database = new MySQLDatabase(username, password, hostname, port, databaseUrl);
             }
             else
-                database = new SQLiteDatabase(getDataFolder() + File.separator + "database.db");
+                database = new SQLiteDatabase(getDataFolder().getAbsolutePath() + File.separator + "database.db");
 
             database.createUserTable();
             database.createMountsTable();
@@ -59,6 +60,7 @@ public class Mounts extends JavaPlugin
         catch (SQLException e)
         {
             getLogger().severe("Error while connecting to the database! Quitting plugin!");
+            e.printStackTrace();
             Bukkit.getServer().getPluginManager().disablePlugin(this);
         }
     }
@@ -70,6 +72,15 @@ public class Mounts extends JavaPlugin
             for (Entity horse : world.getEntitiesByClasses(Horse.class))
                 if(Mount.isMount((LivingEntity) horse))
                     horse.remove();
+
+        try
+        {
+            database.closeConnection();
+        }
+        catch (Exception ignore)
+        {
+
+        }
     }
 
     public static Mounts getInstance()

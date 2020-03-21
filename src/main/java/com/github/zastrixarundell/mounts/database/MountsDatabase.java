@@ -1,6 +1,9 @@
 package com.github.zastrixarundell.mounts.database;
 
+import com.github.zastrixarundell.mounts.Mounts;
+import com.github.zastrixarundell.mounts.entities.Mount;
 import com.github.zastrixarundell.mounts.entities.Rider;
+import com.github.zastrixarundell.mounts.values.MountRace;
 
 import java.sql.*;
 import java.text.SimpleDateFormat;
@@ -52,7 +55,7 @@ public abstract class MountsDatabase
 
     // WORK LOGIC
 
-    private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    public static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     static
     {
@@ -96,7 +99,7 @@ public abstract class MountsDatabase
         float skillLevel = resultSet.getFloat("skill_level");
         String lastDate = resultSet.getString("last_date");
 
-        return new Rider(skillLevel, lastDate, new ArrayList<>());
+        return new Rider(skillLevel, lastDate, getMounts(uuid));
     }
 
     private ResultSet getPlayerSQL(UUID uuid) throws SQLException
@@ -116,9 +119,28 @@ public abstract class MountsDatabase
         return resultSet;
     }
 
-    private ResultSet getMounts()
+    private List<Mount> getMounts(UUID uuid) throws SQLException
     {
+        String query =
+                "SELECT race, type, name FROM mounts WHERE owner_uuid LIKE \"" + uuid.toString() + "\"";
 
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery(query);
+
+        List<Mount> mounts = new ArrayList<>();
+
+        while(resultSet.next())
+        {
+            String raceString = resultSet.getString("race");
+            int type = resultSet.getInt("type");
+            String name = resultSet.getString("name");
+
+            MountRace race = MountRace.valueOf(raceString.toUpperCase());
+
+            mounts.add(new Mount(uuid, race, type, name));
+        }
+
+        return mounts;
     }
 
     /*
@@ -142,6 +164,11 @@ public abstract class MountsDatabase
             System.out.println(rider.getSkillLevel());
             System.out.println(uuid.toString());
         }
+    }
+
+    public void closeConnection() throws SQLException
+    {
+        connection.close();
     }
 
 }
