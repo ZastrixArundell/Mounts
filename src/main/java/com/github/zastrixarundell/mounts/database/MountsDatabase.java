@@ -1,6 +1,5 @@
 package com.github.zastrixarundell.mounts.database;
 
-import com.github.zastrixarundell.mounts.Mounts;
 import com.github.zastrixarundell.mounts.entities.Mount;
 import com.github.zastrixarundell.mounts.entities.Rider;
 import com.github.zastrixarundell.mounts.values.MountRace;
@@ -15,9 +14,9 @@ public abstract class MountsDatabase
 
     private Connection connection;
 
-    MountsDatabase(String path) throws SQLException
+    MountsDatabase(String path, String username, String password) throws SQLException
     {
-        connection = DriverManager.getConnection(path);
+        connection = DriverManager.getConnection(path, username, password);
     }
 
     // jmKMwELHdT
