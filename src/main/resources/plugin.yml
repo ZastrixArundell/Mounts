@@ -3,6 +3,9 @@ description: Plugin for ESO styled mounts.
 version: ${version}
 name: Mounts
 author: Zastrix
+api-version: '1.15'
+depend:
+  - Citizens
 
 commands:
   mounts:

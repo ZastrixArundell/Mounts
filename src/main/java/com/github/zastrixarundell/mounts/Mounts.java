@@ -1,5 +1,6 @@
 package com.github.zastrixarundell.mounts;
 
+import com.github.zastrixarundell.mounts.citizens.MountTrainerTrait;
 import com.github.zastrixarundell.mounts.commands.MountsCommand;
 import com.github.zastrixarundell.mounts.database.MountsDatabase;
 import com.github.zastrixarundell.mounts.database.MySQLDatabase;
@@ -7,6 +8,8 @@ import com.github.zastrixarundell.mounts.database.SQLiteDatabase;
 import com.github.zastrixarundell.mounts.entities.Mount;
 import com.github.zastrixarundell.mounts.listeners.MountStateListener;
 import com.github.zastrixarundell.mounts.listeners.PlayerEventListener;
+import net.citizensnpcs.api.CitizensAPI;
+import net.citizensnpcs.api.trait.TraitInfo;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -36,6 +39,7 @@ public class Mounts extends JavaPlugin
         new MountStateListener(this);
         new PlayerEventListener(this);
         setupDatabase();
+        CitizensAPI.getTraitFactory().registerTrait(TraitInfo.create(MountTrainerTrait.class).withName("mounttrainer"));
     }
 
     @Override
