@@ -335,11 +335,11 @@ public abstract class MountsDatabase
 
      */
 
+    abstract String setMountToHostlerQuery(float price);
+
     public void setMountToHostler(UUID hostlerUUID, int mountId, float price) throws SQLException
     {
-        String query =
-                "INSERT OR REPLACE INTO mounts_hostlers(hostler_uuid, mount_id, price) " +
-                "VALUES(?, ?, ?);";
+        String query = setMountToHostlerQuery(price);
 
         PreparedStatement preparedStatement = connection.prepareStatement(query);
         preparedStatement.setString(1, hostlerUUID.toString());
@@ -348,6 +348,16 @@ public abstract class MountsDatabase
 
         preparedStatement.execute();
         preparedStatement.close();
+    }
+
+    public void removeMountFromHostler(UUID hostlerUUID, int mountId) throws SQLException
+    {
+        String query =
+                "DELETE FROM mounts_hostlers WHERE mount_id == " + mountId;
+
+        Statement statement = connection.createStatement();
+        statement.execute(query);
+        statement.close();
     }
 
     /**
