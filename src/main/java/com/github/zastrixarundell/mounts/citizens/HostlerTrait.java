@@ -5,12 +5,15 @@ import net.citizensnpcs.api.event.NPCRightClickEvent;
 import net.citizensnpcs.api.trait.Trait;
 import org.bukkit.event.EventHandler;
 
-public class MountTrainerTrait extends Trait
+/**
+ * Citizen trait where you can train your mount riding skill and buy mounts as well.
+ */
+public class HostlerTrait extends Trait
 {
 
-    public MountTrainerTrait()
+    public HostlerTrait()
     {
-        super("mounttrainer");
+        super("hostler");
     }
 
     @EventHandler

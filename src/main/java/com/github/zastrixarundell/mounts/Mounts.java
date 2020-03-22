@@ -1,6 +1,6 @@
 package com.github.zastrixarundell.mounts;
 
-import com.github.zastrixarundell.mounts.citizens.MountTrainerTrait;
+import com.github.zastrixarundell.mounts.citizens.HostlerTrait;
 import com.github.zastrixarundell.mounts.commands.MountsCommand;
 import com.github.zastrixarundell.mounts.database.MountsDatabase;
 import com.github.zastrixarundell.mounts.database.MySQLDatabase;
@@ -39,7 +39,7 @@ public class Mounts extends JavaPlugin
         new MountStateListener(this);
         new PlayerEventListener(this);
         setupDatabase();
-        CitizensAPI.getTraitFactory().registerTrait(TraitInfo.create(MountTrainerTrait.class).withName("mounttrainer"));
+        CitizensAPI.getTraitFactory().registerTrait(TraitInfo.create(HostlerTrait.class).withName("hostler"));
     }
 
     @Override
