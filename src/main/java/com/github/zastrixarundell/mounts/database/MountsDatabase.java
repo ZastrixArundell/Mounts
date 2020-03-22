@@ -305,7 +305,7 @@ public abstract class MountsDatabase
     public void insertNewMount(String race, int type, String name) throws SQLException
     {
         String query =
-                "SELECT COUNT(id) AS count FROM mounts_list";
+                "SELECT MAX(id) AS count FROM mounts_list";
 
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery(query);
