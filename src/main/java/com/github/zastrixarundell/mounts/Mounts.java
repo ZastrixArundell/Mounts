@@ -6,6 +6,8 @@ import com.github.zastrixarundell.mounts.database.MountsDatabase;
 import com.github.zastrixarundell.mounts.database.MySQLDatabase;
 import com.github.zastrixarundell.mounts.database.SQLiteDatabase;
 import com.github.zastrixarundell.mounts.entities.Mount;
+import com.github.zastrixarundell.mounts.gui.HostlerGUI;
+import com.github.zastrixarundell.mounts.gui.PlayerGUI;
 import com.github.zastrixarundell.mounts.listeners.MountStateListener;
 import com.github.zastrixarundell.mounts.listeners.PlayerEventListener;
 import net.citizensnpcs.api.CitizensAPI;
@@ -40,6 +42,8 @@ public class Mounts extends JavaPlugin
         new PlayerEventListener(this);
         setupDatabase();
         CitizensAPI.getTraitFactory().registerTrait(TraitInfo.create(HostlerTrait.class).withName("hostler"));
+        new HostlerGUI(this);
+        new PlayerGUI(this);
     }
 
     @Override

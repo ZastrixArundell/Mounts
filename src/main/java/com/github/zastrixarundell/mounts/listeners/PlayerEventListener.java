@@ -67,38 +67,4 @@ public class PlayerEventListener implements Listener
         }
     }
 
-    @EventHandler
-    private void disableGuiMenuClick(InventoryClickEvent event)
-    {
-        if(!event.getView().getTitle().startsWith("Your mounts - page"))
-            return;
-
-        event.setCancelled(true);
-
-        Player player = (Player) event.getWhoClicked();
-        player.updateInventory();
-
-        if (event.getCurrentItem() == null)
-            return;
-
-        if (event.getCurrentItem().getItemMeta() == null)
-            return;
-
-        ItemStack item = event.getCurrentItem();
-
-        if(item.getType() != Material.SADDLE)
-            return;
-
-        String name = ChatColor.stripColor(item.getItemMeta().getDisplayName().replace(" ", "_").toUpperCase());
-
-        player.closeInventory();
-
-
-        Optional<Rider> riderOptional = Rider.asRider(player);
-
-        if(!riderOptional.isPresent())
-            return;
-
-        new Mount(player.getUniqueId(), MountRace.HORSE, 0, "kek").spawn();
-    }
 }

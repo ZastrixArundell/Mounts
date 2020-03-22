@@ -1,6 +1,6 @@
 package com.github.zastrixarundell.mounts.citizens;
 
-import com.github.zastrixarundell.mounts.utils.GUIUtils;
+import com.github.zastrixarundell.mounts.gui.PlayerGUI;
 import net.citizensnpcs.api.event.NPCRightClickEvent;
 import net.citizensnpcs.api.trait.Trait;
 import org.bukkit.event.EventHandler;
@@ -22,6 +22,6 @@ public class HostlerTrait extends Trait
         if(event.getNPC() != this.getNPC())
             return;
 
-        GUIUtils.openGUI(event.getClicker(), 1);
+        PlayerGUI.openMountsToPlayer(event.getClicker(), 1);
     }
 }

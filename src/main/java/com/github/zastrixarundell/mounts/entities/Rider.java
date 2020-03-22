@@ -56,6 +56,15 @@ public class Rider
     }
 
     /**
+     * Gets the UUID of the rider
+     * @return The UUID of the rider.
+     */
+    public UUID getUUID()
+    {
+        return user;
+    }
+
+    /**
      * Gets the last date of when the skill was updated.
      * @return String representation of the last date the skill was updated.
      */
