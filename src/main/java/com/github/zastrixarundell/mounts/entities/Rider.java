@@ -56,6 +56,15 @@ public class Rider
     }
 
     /**
+     * Gets the UUID of the rider
+     * @return The UUID of the rider.
+     */
+    public UUID getUUID()
+    {
+        return user;
+    }
+
+    /**
      * Gets the last date of when the skill was updated.
      * @return String representation of the last date the skill was updated.
      */
@@ -74,6 +83,7 @@ public class Rider
             MountsDatabase database = Mounts.getDatabase();
             database.updatePlayerLevel(user);
             skillLevel = (float) Math.min(skillLevel + 0.1, 10);
+            lastDate = MountsDatabase.simpleDateFormat.format(new Date());
             riderMap.put(user, this);
         }
         catch (SQLException e)

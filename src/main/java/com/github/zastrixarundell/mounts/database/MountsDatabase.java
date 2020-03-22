@@ -75,7 +75,7 @@ public abstract class MountsDatabase
          Simple date format which will be written and read from the database.
          The static block after this just sets the timezone as setting the timezone is a void function.
      */
-    public static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("https://github.com/ZastrixArundell/Mounts");
+    public static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     static
     {

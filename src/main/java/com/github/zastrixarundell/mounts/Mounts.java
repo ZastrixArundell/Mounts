@@ -1,12 +1,17 @@
 package com.github.zastrixarundell.mounts;
 
+import com.github.zastrixarundell.mounts.citizens.HostlerTrait;
 import com.github.zastrixarundell.mounts.commands.MountsCommand;
 import com.github.zastrixarundell.mounts.database.MountsDatabase;
 import com.github.zastrixarundell.mounts.database.MySQLDatabase;
 import com.github.zastrixarundell.mounts.database.SQLiteDatabase;
 import com.github.zastrixarundell.mounts.entities.Mount;
+import com.github.zastrixarundell.mounts.gui.HostlerGUI;
+import com.github.zastrixarundell.mounts.gui.PlayerGUI;
 import com.github.zastrixarundell.mounts.listeners.MountStateListener;
 import com.github.zastrixarundell.mounts.listeners.PlayerEventListener;
+import net.citizensnpcs.api.CitizensAPI;
+import net.citizensnpcs.api.trait.TraitInfo;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -36,6 +41,9 @@ public class Mounts extends JavaPlugin
         new MountStateListener(this);
         new PlayerEventListener(this);
         setupDatabase();
+        CitizensAPI.getTraitFactory().registerTrait(TraitInfo.create(HostlerTrait.class).withName("hostler"));
+        new HostlerGUI(this);
+        new PlayerGUI(this);
     }
 
     @Override
@@ -54,6 +62,8 @@ public class Mounts extends JavaPlugin
         {
 
         }
+
+        CitizensAPI.getTraitFactory().deregisterTrait(TraitInfo.create(HostlerTrait.class).withName("hostler"));
     }
 
     private void setupDatabase()

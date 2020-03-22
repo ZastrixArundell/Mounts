@@ -7,7 +7,7 @@ public class SQLiteDatabase extends MountsDatabase
 
     public SQLiteDatabase(String uri) throws SQLException
     {
-        super("jdbc:sqlite://" + uri, null, null);
+        super("jdbc:sqlite://" + uri, "", "");
     }
 
 }

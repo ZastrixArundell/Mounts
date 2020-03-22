@@ -1,7 +1,7 @@
 package com.github.zastrixarundell.mounts.commands;
 
 import com.github.zastrixarundell.mounts.Mounts;
-import com.github.zastrixarundell.mounts.utils.GUIUtils;
+import com.github.zastrixarundell.mounts.gui.PlayerGUI;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -32,7 +32,7 @@ public class MountsCommand implements CommandExecutor
 
         Player sender = (Player) commandSender;
 
-        GUIUtils.openGUI(sender, 1);
+        PlayerGUI.openMountsToPlayer(sender, 1);
 
         return true;
     }
