@@ -24,7 +24,11 @@ public abstract class MountsDatabase
         connection = DriverManager.getConnection(path, username, password);
     }
 
-    // jmKMwELHdT
+    /*
+
+        Table creation data
+
+     */
 
     /**
      * Creates the table which corresponds to the owners of this plugin. Relation is one to many
@@ -84,9 +88,36 @@ public abstract class MountsDatabase
         statement.close();
     }
 
-    /*
-        Work logic of the database IO starts here.
+    /**
+     * Hostler table from which you can buy mounts. It has the data for the uuid of the hostler,
+     * the mount id and the price of the mount for that specific hostler.
+     * @throws SQLException Exception in csse there is an error
      */
+    public void createHolstersTable() throws SQLException
+    {
+        String query =
+                "CREATE TABLE IF NOT EXISTS mounts_hostlers(" +
+                        "hostler_uuid VARCHAR(255) NOT NULL," +
+                        "mount_id INTEGER NOT NULL," +
+                        "price DOUBLE DEFAULT 0," +
+                        "FOREIGN KEY (mount_id) REFERENCES mounts_list (id)," +
+                        "CONSTRAINT unique_hostler_mount UNIQUE (hostler_uuid, mount_id)" +
+                ")";
+
+        Statement statement = connection.createStatement();
+        statement.execute(query);
+        statement.close();
+    }
+
+    /*
+
+        Work logic of the database IO starts here.
+
+     */
+
+
+
+
 
     /*
          Simple date format which will be written and read from the database.
@@ -99,39 +130,11 @@ public abstract class MountsDatabase
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
     }
 
-    /**
-     * Inserts a mount to the `mount_list` table. ID is automatically incremented.
-     * @param race The race of the mount.
-     * @param type The type of the mount.
-     * @param name The name of the mount.
-     * @throws SQLException Exception in case there is an error during IO.
+    /*
+
+        All of the functions regarding players-specific data.
+
      */
-    public void insertNewMount(String race, int type, String name) throws SQLException
-    {
-        String query =
-                "SELECT COUNT(id) AS count FROM mounts_list";
-
-        Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery(query);
-
-        resultSet.next();
-
-        int count = resultSet.getInt("count");
-        count++;
-
-        String command =
-                "INSERT INTO mounts_list(id, race, type, name) " +
-                "VALUES (?, ?, ?, ?);";
-
-        PreparedStatement preparedStatement = connection.prepareStatement(command);
-        preparedStatement.setInt(1, count);
-        preparedStatement.setString(2, race);
-        preparedStatement.setInt(3, type);
-        preparedStatement.setString(4, name);
-
-        preparedStatement.execute();
-        preparedStatement.close();
-    }
 
     /**
      * Gets the data of the player corresponding to the specified UUID. Returns an
@@ -169,25 +172,6 @@ public abstract class MountsDatabase
         Statement statement = connection.createStatement();
         statement.execute(command);
         statement.close();
-    }
-
-    /**
-     * Gives a mount to the player.
-     * @param playerUUID The UUID of the player.
-     * @param mountId The ID of the mount.
-     * @throws SQLException Exception in case an error happened during IO.
-     */
-    public void giveMountToPlayer(UUID playerUUID, int mountId) throws SQLException
-    {
-        String command = "INSERT INTO mounts_owning(owner_uuid, mount_id) " +
-                "VALUES (?, ?);";
-
-        PreparedStatement preparedStatement = connection.prepareStatement(command);
-        preparedStatement.setString(1, playerUUID.toString());
-        preparedStatement.setInt(2, mountId);
-
-        preparedStatement.execute();
-        preparedStatement.close();
     }
 
     /**
@@ -230,6 +214,31 @@ public abstract class MountsDatabase
         PreparedStatement preparedStatement = connection.prepareStatement(command);
         preparedStatement.setString(1, uuid.toString());
         preparedStatement.setString(2, dateNow);
+
+        preparedStatement.execute();
+        preparedStatement.close();
+    }
+
+    /*
+
+        Data which is half player half mount
+
+     */
+
+    /**
+     * Gives a mount to the player.
+     * @param playerUUID The UUID of the player.
+     * @param mountId The ID of the mount.
+     * @throws SQLException Exception in case an error happened during IO.
+     */
+    public void giveMountToPlayer(UUID playerUUID, int mountId) throws SQLException
+    {
+        String command = "INSERT INTO mounts_owning(owner_uuid, mount_id) " +
+                "VALUES (?, ?);";
+
+        PreparedStatement preparedStatement = connection.prepareStatement(command);
+        preparedStatement.setString(1, playerUUID.toString());
+        preparedStatement.setInt(2, mountId);
 
         preparedStatement.execute();
         preparedStatement.close();
@@ -280,6 +289,67 @@ public abstract class MountsDatabase
         return mounts;
     }
 
+    /*
+
+        Data which is mount specific
+
+     */
+
+    /**
+     * Inserts a mount to the `mount_list` table. ID is automatically incremented.
+     * @param race The race of the mount.
+     * @param type The type of the mount.
+     * @param name The name of the mount.
+     * @throws SQLException Exception in case there is an error during IO.
+     */
+    public void insertNewMount(String race, int type, String name) throws SQLException
+    {
+        String query =
+                "SELECT COUNT(id) AS count FROM mounts_list";
+
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery(query);
+
+        resultSet.next();
+
+        int count = resultSet.getInt("count");
+        count++;
+
+        String command =
+                "INSERT INTO mounts_list(id, race, type, name) " +
+                "VALUES (?, ?, ?, ?);";
+
+        PreparedStatement preparedStatement = connection.prepareStatement(command);
+        preparedStatement.setInt(1, count);
+        preparedStatement.setString(2, race);
+        preparedStatement.setInt(3, type);
+        preparedStatement.setString(4, name);
+
+        preparedStatement.execute();
+        preparedStatement.close();
+    }
+
+    /*
+
+        Data which is hostler specific
+
+     */
+
+    public void setMountToHostler(UUID hostlerUUID, int mountId, float price) throws SQLException
+    {
+        String query =
+                "INSERT OR REPLACE INTO mounts_hostlers(hostler_uuid, mount_id, price) " +
+                "VALUES(?, ?, ?);";
+
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+        preparedStatement.setString(1, hostlerUUID.toString());
+        preparedStatement.setInt(2, mountId);
+        preparedStatement.setFloat(3, price);
+
+        preparedStatement.execute();
+        preparedStatement.close();
+    }
+
     /**
      * Function only used when debugging the database. Unnecessary when used as a plugin.
      * @param args Args so it is compatible with Java main, unneeded.
@@ -292,9 +362,11 @@ public abstract class MountsDatabase
         database.createUserTable();
         database.createMountsTable();
         database.createMountOwningTable();
+        database.createHolstersTable();
 
         UUID uuid = UUID.fromString("25f7b39e-4458-4b72-9ccb-93efb8213d6a");
 
+        /*
         // Update the level here
         for (int i = 0; i < 1010; i++)
         {
@@ -304,11 +376,12 @@ public abstract class MountsDatabase
             rider = database.getPlayerData(uuid);
             System.out.println(rider.getSkillLevel());
             System.out.println(uuid.toString());
-        }
+        }*/
 
-        database.giveMountToPlayer(uuid, 5);
-        Rider rider = database.getPlayerData(uuid);
-        System.out.println(rider.getMounts());
+        database.setMountToHostler(uuid, 3, 100);
+        database.setMountToHostler(uuid, 3, 101);
+        database.setMountToHostler(uuid, 3, 110);
+        database.setMountToHostler(uuid, 3, 0);
 
         database.insertNewMount("Horse", 1, "Ello");
     }
