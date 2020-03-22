@@ -83,6 +83,7 @@ public class Rider
             MountsDatabase database = Mounts.getDatabase();
             database.updatePlayerLevel(user);
             skillLevel = (float) Math.min(skillLevel + 0.1, 10);
+            lastDate = MountsDatabase.simpleDateFormat.format(new Date());
             riderMap.put(user, this);
         }
         catch (SQLException e)

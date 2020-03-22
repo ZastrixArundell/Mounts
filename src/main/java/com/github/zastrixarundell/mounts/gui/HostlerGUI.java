@@ -24,8 +24,6 @@ import java.util.concurrent.TimeUnit;
 public class HostlerGUI implements Listener
 {
 
-    private static Calendar calendar = null;
-
     public HostlerGUI(Mounts plugin)
     {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
@@ -60,13 +58,15 @@ public class HostlerGUI implements Listener
             return;
         }
 
-        long difference = Math.abs(currentInGMT.getTime() - lastUpdate.getTime());
+        long difference = currentInGMT.getTime() - lastUpdate.getTime();
         long inDays = TimeUnit.DAYS.convert(difference, TimeUnit.MILLISECONDS);
 
         ItemStack button = inDays >= 1 ? getOkayItemStack() : getNonOkayItemStack(difference);
 
         Inventory inventory = Bukkit.createInventory(player, 54, "Hostler - page " + page);
         inventory.setItem(53, button);
+
+        player.openInventory(inventory);
     }
 
     /**
@@ -96,7 +96,9 @@ public class HostlerGUI implements Listener
      */
     private static ItemStack getNonOkayItemStack(long difference)
     {
-        ItemStack item = new ItemStack(Material.RED_STAINED_GLASS, 1);
+        difference = TimeUnit.DAYS.toMillis(1) - difference;
+
+        ItemStack item = new ItemStack(Material.RED_STAINED_GLASS_PANE, 1);
         ItemMeta meta = item.getItemMeta();
 
         if(meta == null)
@@ -106,7 +108,7 @@ public class HostlerGUI implements Listener
 
         long hours = TimeUnit.HOURS.convert(difference, TimeUnit.MILLISECONDS);
         long minutes = TimeUnit.MINUTES.convert(difference, TimeUnit.MILLISECONDS) - hours*60;
-        long seconds = TimeUnit.SECONDS.convert(difference, TimeUnit.MILLISECONDS) - hours*60 - minutes*60;
+        long seconds = TimeUnit.SECONDS.convert(difference, TimeUnit.MILLISECONDS) - hours*60*60 - minutes*60;
 
         meta.setLore(Arrays.asList("Level up the riding skill of the player.", " ", "You need to wait " +
                 hours + " hour(s), " + minutes + " minute(s) and " + seconds + " second(s)."));
@@ -147,6 +149,8 @@ public class HostlerGUI implements Listener
                 return;
 
             riderOptional.get().updateLevel();
+
+            player.closeInventory();
         }
     }
 

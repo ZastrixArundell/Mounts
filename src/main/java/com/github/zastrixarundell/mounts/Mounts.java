@@ -62,6 +62,8 @@ public class Mounts extends JavaPlugin
         {
 
         }
+
+        CitizensAPI.getTraitFactory().deregisterTrait(TraitInfo.create(HostlerTrait.class).withName("hostler"));
     }
 
     private void setupDatabase()
