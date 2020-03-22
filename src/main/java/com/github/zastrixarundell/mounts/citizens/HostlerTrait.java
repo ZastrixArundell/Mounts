@@ -1,5 +1,6 @@
 package com.github.zastrixarundell.mounts.citizens;
 
+import com.github.zastrixarundell.mounts.gui.HostlerGUI;
 import com.github.zastrixarundell.mounts.gui.PlayerGUI;
 import net.citizensnpcs.api.event.NPCRightClickEvent;
 import net.citizensnpcs.api.trait.Trait;
@@ -22,6 +23,6 @@ public class HostlerTrait extends Trait
         if(event.getNPC() != this.getNPC())
             return;
 
-        PlayerGUI.openMountsToPlayer(event.getClicker(), 1);
+        HostlerGUI.openHostlerGUIToPlayer(event.getClicker(), 1);
     }
 }
