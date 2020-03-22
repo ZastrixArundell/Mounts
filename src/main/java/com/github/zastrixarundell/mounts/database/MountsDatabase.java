@@ -405,6 +405,7 @@ public abstract class MountsDatabase
         database.setMountToHostler(uuid, 3, 101);
         database.setMountToHostler(uuid, 3, 110);
         database.setMountToHostler(uuid, 3, 0);
+        database.removeMountFromHostler(uuid, 3);
 
         database.insertNewMount("Horse", 1, "Ello");
     }
