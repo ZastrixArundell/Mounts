@@ -337,6 +337,13 @@ public abstract class MountsDatabase
 
     abstract String setMountToHostlerQuery(float price);
 
+    /**
+     * Sets the mount to the hostler. Add or update when needed.
+     * @param hostlerUUID The UUID of the hostler.
+     * @param mountId The ID of the mount.
+     * @param price The price of the mount.
+     * @throws SQLException Exception thrown in case there is an error during IO.
+     */
     public void setMountToHostler(UUID hostlerUUID, int mountId, float price) throws SQLException
     {
         String query = setMountToHostlerQuery(price);
@@ -350,10 +357,16 @@ public abstract class MountsDatabase
         preparedStatement.close();
     }
 
+    /**
+     * Removed the mount from the hostler.
+     * @param hostlerUUID The UUID of the hostler.
+     * @param mountId The ID of the mount.
+     * @throws SQLException Exception thrown in case there is an error during IO.
+     */
     public void removeMountFromHostler(UUID hostlerUUID, int mountId) throws SQLException
     {
         String query =
-                "DELETE FROM mounts_hostlers WHERE mount_id == " + mountId;
+                "DELETE FROM mounts_hostlers WHERE mount_id = " + mountId;
 
         Statement statement = connection.createStatement();
         statement.execute(query);
