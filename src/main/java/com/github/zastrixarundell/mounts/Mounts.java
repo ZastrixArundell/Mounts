@@ -87,7 +87,7 @@ public class Mounts extends JavaPlugin
                 database = new SQLiteDatabase(getDataFolder().getAbsolutePath() + File.separator + "database.db");
 
             database.createUserTable();
-            database.createMountsTable();
+            database.createMountOwningTable();
         }
         catch (SQLException e)
         {

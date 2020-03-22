@@ -46,20 +46,37 @@ public abstract class MountsDatabase
     }
 
     /**
-     * Create the table which corresponds to the mount table. Relation of this is one to one (one mount towards
-     * one owner).
+     * Create the table which corresponds to the mount owning table. Relation of this is many to many.
+     * @throws SQLException Exception thrown in case there is an error while creating the table.
+     */
+    public void createMountOwningTable() throws SQLException
+    {
+        String query =
+                "CREATE TABLE IF NOT EXISTS mounts_owning(" +
+                        "owner_uuid VARCHAR(255) NOT NULL," +
+                        "mount_id INTEGER NOT NULL," +
+                        "FOREIGN KEY (owner_uuid) REFERENCES mounts_players (uuid)," +
+                        "FOREIGN KEY (mount_id) REFERENCES mounts_list (id)" +
+                ")";
+
+        Statement statement = connection.createStatement();
+        statement.execute(query);
+        statement.close();
+    }
+
+    /**
+     * Create the table corresponding to all of the available mounts on the server. Relation is
+     * many to many with the owning table.
      * @throws SQLException Exception thrown in case there is an error while creating the table.
      */
     public void createMountsTable() throws SQLException
     {
         String query =
-                "CREATE TABLE IF NOT EXISTS mounts(" +
-                        "owner_uuid VARCHAR(255) NOT NULL," +
+                "CREATE TABLE IF NOT EXISTS mounts_list(" +
+                        "id INTEGER NOT NULL PRIMARY KEY," +
                         "race VARCHAR(255) NOT NULL," +
                         "type INTEGER," +
-                        "name VARCHAR(255)," +
-                        "CONSTRAINT mount_owners " +
-                        "FOREIGN KEY (owner_uuid) REFERENCES mounts_players (uuid)" +
+                        "name VARCHAR(255)" +
                 ")";
 
         Statement statement = connection.createStatement();
@@ -80,6 +97,40 @@ public abstract class MountsDatabase
     static
     {
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+    }
+
+    /**
+     * Inserts a mount to the `mount_list` table. ID is automatically incremented.
+     * @param race The race of the mount.
+     * @param type The type of the mount.
+     * @param name The name of the mount.
+     * @throws SQLException Exception in case there is an error during IO.
+     */
+    public void insertNewMount(String race, int type, String name) throws SQLException
+    {
+        String query =
+                "SELECT COUNT(id) AS count FROM mounts_list";
+
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery(query);
+
+        resultSet.next();
+
+        int count = resultSet.getInt("count");
+        count++;
+
+        String command =
+                "INSERT INTO mounts_list(id, race, type, name) " +
+                "VALUES (?, ?, ?, ?);";
+
+        PreparedStatement preparedStatement = connection.prepareStatement(command);
+        preparedStatement.setInt(1, count);
+        preparedStatement.setString(2, race);
+        preparedStatement.setInt(3, type);
+        preparedStatement.setString(4, name);
+
+        preparedStatement.execute();
+        preparedStatement.close();
     }
 
     /**
@@ -118,6 +169,25 @@ public abstract class MountsDatabase
         Statement statement = connection.createStatement();
         statement.execute(command);
         statement.close();
+    }
+
+    /**
+     * Gives a mount to the player.
+     * @param playerUUID The UUID of the player.
+     * @param mountId The ID of the mount.
+     * @throws SQLException Exception in case an error happened during IO.
+     */
+    public void giveMountToPlayer(UUID playerUUID, int mountId) throws SQLException
+    {
+        String command = "INSERT INTO mounts_owning(owner_uuid, mount_id) " +
+                "VALUES (?, ?);";
+
+        PreparedStatement preparedStatement = connection.prepareStatement(command);
+        preparedStatement.setString(1, playerUUID.toString());
+        preparedStatement.setInt(2, mountId);
+
+        preparedStatement.execute();
+        preparedStatement.close();
     }
 
     /**
@@ -173,14 +243,26 @@ public abstract class MountsDatabase
      * @return A list of mounts which the player has.
      * @throws SQLException Exception in case there is an error during IO.
      */
-    @Deprecated
     private List<Mount> getMounts(UUID uuid) throws SQLException
     {
         String query =
-                "SELECT race, type, name FROM mounts WHERE owner_uuid LIKE \"" + uuid.toString() + "\"";
+                "SELECT mount_id FROM mounts_owning WHERE owner_uuid LIKE \"" + uuid.toString() + "\"";
 
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery(query);
+
+        ArrayList<String> ids = new ArrayList<>();
+
+        while(resultSet.next())
+            ids.add(String.valueOf(resultSet.getInt("mount_id")));
+
+        String names = String.join(", ", ids);
+
+        query =
+                "SELECT race, type, name FROM mounts_list WHERE id IN (" + names + ")";
+
+        statement = connection.createStatement();
+        resultSet = statement.executeQuery(query);
 
         List<Mount> mounts = new ArrayList<>();
 
@@ -209,9 +291,11 @@ public abstract class MountsDatabase
         MountsDatabase database = new SQLiteDatabase(databaseUri);
         database.createUserTable();
         database.createMountsTable();
+        database.createMountOwningTable();
+
         UUID uuid = UUID.fromString("25f7b39e-4458-4b72-9ccb-93efb8213d6a");
 
-        /* Update the level here */
+        // Update the level here
         for (int i = 0; i < 1010; i++)
         {
             Rider rider = database.getPlayerData(uuid);
@@ -221,6 +305,12 @@ public abstract class MountsDatabase
             System.out.println(rider.getSkillLevel());
             System.out.println(uuid.toString());
         }
+
+        database.giveMountToPlayer(uuid, 5);
+        Rider rider = database.getPlayerData(uuid);
+        System.out.println(rider.getMounts());
+
+        database.insertNewMount("Horse", 1, "Ello");
     }
 
     /**
