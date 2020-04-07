@@ -11,4 +11,15 @@ public class MySQLDatabase extends MountsDatabase
         super("jdbc:mysql://" + hostname + ":" + port + "/" + database, username, password);
     }
 
+
+    /**
+     * TODO Need to add this, I am focusing on SQLite for now.
+     * @param price
+     * @return
+     */
+    @Override
+    String setMountToHostlerQuery(float price)
+    {
+        return "";
+    }
 }
